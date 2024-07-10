@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -8,12 +8,15 @@ import { motion } from "framer-motion";
 import { auth } from "../helpers/firebase";
 import Loader from "./common/Loader";
 import toast from "react-hot-toast";
+import { useAuthState } from "react-firebase-hooks/auth";
 
 const AuthForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(true);
   const [loader, setLoader] = useState(false);
+
+  const [user] = useAuthState(auth);
   const navigate = useNavigate();
 
   const handleAuth = async () => {
@@ -22,13 +25,13 @@ const AuthForm = () => {
       if (isSignUp) {
         await createUserWithEmailAndPassword(auth, email, password);
         setLoader(false);
-        toast.success("Signup successful! Redirecting to admin page...");
-        setTimeout(() => navigate("/admin"), 2000);
+        toast.success("Signup successful!");
+        navigate("/dashboard");
       } else {
         await signInWithEmailAndPassword(auth, email, password);
         setLoader(false);
-        toast.success("Login successful! Redirecting to admin page...");
-        setTimeout(() => navigate("/admin"), 2000);
+        toast.success("Login successful!");
+        navigate("/dashboard");
       }
     } catch (error) {
       setLoader(false);
@@ -36,6 +39,8 @@ const AuthForm = () => {
       toast.error(`Error: ${error.message}`);
     }
   };
+
+  if (user) return <Navigate to="/dashboard" />;
 
   return loader ? (
     <Loader />

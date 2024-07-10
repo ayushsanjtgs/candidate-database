@@ -1,9 +1,14 @@
-import React, { useState } from "react";
-import { collection, addDoc } from "firebase/firestore";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { motion } from "framer-motion";
 import { firestore } from "../helpers/firebase";
+import toast from "react-hot-toast";
 
-const AdminForm = () => {
+const EditCandidate = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+
   const [candidate, setCandidate] = useState({
     name: "",
     skills: "",
@@ -13,6 +18,24 @@ const AdminForm = () => {
     codingResults: "",
   });
 
+  useEffect(() => {
+    const fetchCandidate = async () => {
+      try {
+        const docRef = doc(firestore, "candidates", id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setCandidate(docSnap.data());
+        } else {
+          console.log("No such document!");
+        }
+      } catch (error) {
+        console.error("Error fetching document:", error);
+      }
+    };
+
+    fetchCandidate();
+  }, [id]);
+
   const handleChange = (e) => {
     setCandidate({ ...candidate, [e.target.name]: e.target.value });
   };
@@ -20,17 +43,13 @@ const AdminForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await addDoc(collection(firestore, "candidates"), candidate);
-      setCandidate({
-        name: "",
-        skills: "",
-        experience: "",
-        location: "",
-        videoInterview: "",
-        codingResults: "",
-      });
+      const docRef = doc(firestore, "candidates", id);
+      await updateDoc(docRef, candidate);
+      toast.success("Update successful!");
+      navigate("/dashboard");
     } catch (error) {
-      console.error("Error adding candidate: ", error);
+      toast.error("Error updating candidate:", error);
+      console.error("Error updating candidate:", error);
     }
   };
 
@@ -44,7 +63,7 @@ const AdminForm = () => {
         onSubmit={handleSubmit}
         className="bg-white p-8 rounded-lg shadow-md w-full max-w-md"
       >
-        <h2 className="text-2xl font-semibold mb-6">Add Candidate</h2>
+        <h2 className="text-2xl font-semibold mb-6">Edit Candidate</h2>
         <input
           name="name"
           value={candidate.name}
@@ -91,11 +110,11 @@ const AdminForm = () => {
           type="submit"
           className="w-full p-2 bg-blue-500 text-white rounded"
         >
-          Add Candidate
+          Update Candidate
         </button>
       </form>
     </motion.div>
   );
 };
 
-export default AdminForm;
+export default EditCandidate;
