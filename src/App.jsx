@@ -3,12 +3,12 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "react-query";
 import AuthForm from "./components/AuthForm";
 import Dashboard from "./components/home/Dashboard";
-import ChartComponent from "./components/ChartComponent";
 import PrivateRoute from "./components/PrivateRoute";
 import EditCandidate from "./components/EditCandidate";
 import Header from "./components/common/Header";
 import AddCandidate from "./components/AddCandidate";
 import "./index.css";
+import ChartsPage from "./pages/ChartsPage";
 
 const queryClient = new QueryClient();
 
@@ -39,7 +39,7 @@ const App = () => {
             path="/charts"
             element={
               <PrivateRoute>
-                <ChartComponent />
+                <ChartsPage />
               </PrivateRoute>
             }
           />
