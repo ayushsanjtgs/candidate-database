@@ -6,31 +6,40 @@ import {
 } from "firebase/auth";
 import { motion } from "framer-motion";
 import { auth } from "../helpers/firebase";
+import Loader from "./common/Loader";
+import toast from "react-hot-toast";
 
 const AuthForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(true);
-  const [message, setMessage] = useState("");
+  const [loader, setLoader] = useState(false);
   const navigate = useNavigate();
 
   const handleAuth = async () => {
     try {
+      setLoader(true);
       if (isSignUp) {
         await createUserWithEmailAndPassword(auth, email, password);
-        setMessage("Signup successful! Redirecting to admin page...");
+        setLoader(false);
+        toast.success("Signup successful! Redirecting to admin page...");
         setTimeout(() => navigate("/admin"), 2000);
       } else {
         await signInWithEmailAndPassword(auth, email, password);
-        setMessage("Login successful! Redirecting to admin page...");
+        setLoader(false);
+        toast.success("Login successful! Redirecting to admin page...");
         setTimeout(() => navigate("/admin"), 2000);
       }
     } catch (error) {
-      setMessage(`Error: ${error.message}`);
+      setLoader(false);
+      console.error(error);
+      toast.error(`Error: ${error.message}`);
     }
   };
 
-  return (
+  return loader ? (
+    <Loader />
+  ) : (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -66,9 +75,6 @@ const AuthForm = () => {
         >
           {isSignUp ? "Switch to Login" : "Switch to Sign Up"}
         </button>
-        {message && (
-          <p className="mt-4 text-center text-green-500">{message}</p>
-        )}
       </div>
     </motion.div>
   );
