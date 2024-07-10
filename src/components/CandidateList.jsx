@@ -1,39 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { motion } from "framer-motion";
-import { firestore } from "../helpers/firebase";
 
-const CandidatesList = ({ searchCriteria }) => {
-  const [candidates, setCandidates] = useState([]);
-
-  useEffect(() => {
-    const fetchCandidates = async () => {
-      try {
-        const candidatesCollection = collection(firestore, "candidates");
-        const querySnapshot = await getDocs(candidatesCollection);
-        const candidateList = [];
-        querySnapshot.forEach((doc) => {
-          candidateList.push({ id: doc.id, ...doc.data() });
-        });
-        setCandidates(candidateList);
-      } catch (error) {
-        console.error("Error fetching candidates:", error);
-      }
-    };
-
-    fetchCandidates();
-  }, []);
-
-  const handleDelete = async (id) => {
-    try {
-      await deleteDoc(doc(firestore, "candidates", id));
-      setCandidates(candidates.filter((candidate) => candidate.id !== id));
-    } catch (error) {
-      console.error("Error deleting candidate:", error);
-    }
-  };
-
+const CandidatesList = ({ searchCriteria, candidates, handleDelete }) => {
   const filteredCandidates = candidates.filter((candidate) => {
     const { name, skills, experience, location } = candidate;
     const searchRegex = new RegExp(searchCriteria, "i");
@@ -50,7 +19,7 @@ const CandidatesList = ({ searchCriteria }) => {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="flex flex-col items-center justify-center bg-gray-100"
+      className="flex flex-col items-center justify-center bg-gray-100 overflow-y-auto"
     >
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-4xl">
         <ul className="space-y-4">

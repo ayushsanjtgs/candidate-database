@@ -2,8 +2,12 @@ import React, { useState } from "react";
 import { collection, addDoc } from "firebase/firestore";
 import { motion } from "framer-motion";
 import { firestore } from "../helpers/firebase";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import Loader from "./common/Loader";
 
 const AddCandidate = () => {
+  const navigate = useNavigate();
   const [candidate, setCandidate] = useState({
     name: "",
     skills: "",
@@ -12,6 +16,7 @@ const AddCandidate = () => {
     videoInterview: "",
     codingResults: "",
   });
+  const [loader, setLoader] = useState(false);
 
   const handleChange = (e) => {
     setCandidate({ ...candidate, [e.target.name]: e.target.value });
@@ -19,8 +24,10 @@ const AddCandidate = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoader(true);
     try {
       await addDoc(collection(firestore, "candidates"), candidate);
+      toast.success("Candidate added successfully!");
       setCandidate({
         name: "",
         skills: "",
@@ -29,10 +36,15 @@ const AddCandidate = () => {
         videoInterview: "",
         codingResults: "",
       });
+      setLoader(false);
+      navigate("/dashboard");
     } catch (error) {
       console.error("Error adding candidate: ", error);
+      setLoader(false);
     }
   };
+
+  if (loader) return <Loader />;
 
   return (
     <motion.div
@@ -46,6 +58,7 @@ const AddCandidate = () => {
       >
         <h2 className="text-2xl font-semibold mb-6">Add Candidate</h2>
         <input
+          type="text"
           name="name"
           value={candidate.name}
           onChange={handleChange}
@@ -53,6 +66,7 @@ const AddCandidate = () => {
           className="w-full p-2 mb-4 border rounded"
         />
         <input
+          type="text"
           name="skills"
           value={candidate.skills}
           onChange={handleChange}
@@ -60,6 +74,7 @@ const AddCandidate = () => {
           className="w-full p-2 mb-4 border rounded"
         />
         <input
+          type="number"
           name="experience"
           value={candidate.experience}
           onChange={handleChange}
@@ -67,6 +82,7 @@ const AddCandidate = () => {
           className="w-full p-2 mb-4 border rounded"
         />
         <input
+          type="text"
           name="location"
           value={candidate.location}
           onChange={handleChange}
@@ -74,13 +90,15 @@ const AddCandidate = () => {
           className="w-full p-2 mb-4 border rounded"
         />
         <input
+          type="number"
           name="videoInterview"
           value={candidate.videoInterview}
           onChange={handleChange}
-          placeholder="Video Interview"
+          placeholder="Video Interview Results"
           className="w-full p-2 mb-4 border rounded"
         />
         <input
+          type="number"
           name="codingResults"
           value={candidate.codingResults}
           onChange={handleChange}

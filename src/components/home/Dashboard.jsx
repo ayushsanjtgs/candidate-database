@@ -1,13 +1,53 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import CandidatesList from "../CandidateList";
+import { collection, deleteDoc, doc, getDocs } from "firebase/firestore";
+import { firestore } from "../../helpers/firebase";
+import toast from "react-hot-toast";
+import Loader from "../common/Loader";
 
 const Dashboard = () => {
   const [searchText, setSearchText] = useState("");
+  const [candidates, setCandidates] = useState([]);
+  const [loader, setLoader] = useState(false);
+
+  useEffect(() => {
+    const fetchCandidates = async () => {
+      try {
+        const candidatesCollection = collection(firestore, "candidates");
+        const querySnapshot = await getDocs(candidatesCollection);
+        const candidateList = [];
+        querySnapshot.forEach((doc) => {
+          candidateList.push({ id: doc.id, ...doc.data() });
+        });
+        setCandidates(candidateList);
+      } catch (error) {
+        console.error("Error fetching candidates:", error);
+      }
+    };
+
+    fetchCandidates();
+  }, []);
+
+  const handleDelete = async (id) => {
+    setLoader(true);
+    try {
+      await deleteDoc(doc(firestore, "candidates", id));
+      setCandidates(candidates.filter((candidate) => candidate.id !== id));
+      setLoader(false);
+      toast.success("Candidate deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting candidate:", error);
+      toast.error("Error deleting Candidate:", error);
+      setLoader(false);
+    }
+  };
 
   const handleSearchChange = (e) => {
     setSearchText(e.target.value);
   };
+
+  if (loader) return <Loader />;
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
@@ -28,7 +68,15 @@ const Dashboard = () => {
           placeholder="Search by name, skills, experience..."
           className="w-full p-2 border rounded"
         />
-        <CandidatesList searchCriteria={searchText} />
+        {candidates.length ? (
+          <CandidatesList
+            searchCriteria={searchText}
+            candidates={candidates}
+            handleDelete={handleDelete}
+          />
+        ) : (
+          <p className="text-center mt-10">No Candidates available!</p>
+        )}
       </div>
     </div>
   );
