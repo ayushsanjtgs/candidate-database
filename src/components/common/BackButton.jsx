@@ -9,7 +9,7 @@ const BackButton = () => {
   };
 
   return (
-    <button onClick={goBack} className="text-white py-2 px-4 rounded">
+    <button onClick={goBack} className="text-white py-2 px-4 rounded font-extrabold">
       Back
     </button>
   );

@@ -5,10 +5,11 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { motion } from "framer-motion";
-import { auth } from "../helpers/firebase";
+import { auth, firestore } from "../helpers/firebase";
 import Loader from "./common/Loader";
 import toast from "react-hot-toast";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 const AuthForm = () => {
   const [email, setEmail] = useState("");
@@ -19,16 +20,42 @@ const AuthForm = () => {
   const [user] = useAuthState(auth);
   const navigate = useNavigate();
 
+  const fetchUserData = async () => {
+    try {
+      const userId = localStorage.getItem("uid") || "";
+      console.log(userId);
+      const docRef = doc(firestore, "users", userId);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists) {
+        const userData = docSnap.data();
+        localStorage.setItem("imageUrl", userData.imageUrl || "");
+      } else {
+        console.log("User not found");
+      }
+    } catch (error) {
+      console.error("Error fetching user:", error);
+    }
+  };
+
   const handleAuth = async () => {
     try {
       setLoader(true);
       if (isSignUp) {
-        await createUserWithEmailAndPassword(auth, email, password);
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+        localStorage.setItem("uid", userCredential.user.uid);
+        await setDoc(doc(firestore, "users", userCredential.user.uid), {
+          email,
+        });
         setLoader(false);
         toast.success("Signup successful!");
         navigate("/dashboard");
       } else {
         await signInWithEmailAndPassword(auth, email, password);
+        await fetchUserData()
         setLoader(false);
         toast.success("Login successful!");
         navigate("/dashboard");
