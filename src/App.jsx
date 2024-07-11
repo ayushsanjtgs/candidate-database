@@ -9,7 +9,6 @@ import EditCandidate from "./components/EditCandidate";
 import Header from "./components/common/Header";
 import AddCandidate from "./components/AddCandidate";
 import ChartsPage from "./pages/ChartsPage";
-import Results from "./components/Results";
 
 const queryClient = new QueryClient();
 
@@ -49,14 +48,6 @@ const App = () => {
             element={
               <PrivateRoute>
                 <EditCandidate />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/results"
-            element={
-              <PrivateRoute>
-                <Results />
               </PrivateRoute>
             }
           />
