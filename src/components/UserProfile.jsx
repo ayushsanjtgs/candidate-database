@@ -6,7 +6,6 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import toast from "react-hot-toast";
 
 const UserProfile = () => {
-  const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [designation, setDesignation] = useState("");
   const [image, setImage] = useState(null);
@@ -24,7 +23,6 @@ const UserProfile = () => {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists) {
           const userData = docSnap.data();
-          setEmail(userData.email || "");
           setName(userData.name || "");
           setDesignation(userData.designation || "");
           setImageUrl(userData.imageUrl || "");
