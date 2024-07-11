@@ -64,6 +64,7 @@ const EditCandidate = () => {
         className="bg-white p-8 rounded-lg shadow-md w-full max-w-md"
       >
         <h2 className="text-2xl font-semibold mb-6">Edit Candidate</h2>
+        <label className="text-gray-700">Name</label>
         <input
           name="name"
           value={candidate.name}
@@ -71,6 +72,7 @@ const EditCandidate = () => {
           placeholder="Name"
           className="w-full p-2 mb-4 border rounded"
         />
+        <label className="text-gray-700">Skills</label>
         <input
           name="skills"
           value={candidate.skills}
@@ -78,6 +80,7 @@ const EditCandidate = () => {
           placeholder="Skills"
           className="w-full p-2 mb-4 border rounded"
         />
+        <label className="text-gray-700">Experience</label>
         <input
           name="experience"
           value={candidate.experience}
@@ -85,6 +88,7 @@ const EditCandidate = () => {
           placeholder="Experience"
           className="w-full p-2 mb-4 border rounded"
         />
+        <label className="text-gray-700">Location</label>
         <input
           name="location"
           value={candidate.location}
@@ -92,6 +96,7 @@ const EditCandidate = () => {
           placeholder="Location"
           className="w-full p-2 mb-4 border rounded"
         />
+        <label className="text-gray-700">Video Interview</label>
         <input
           name="videoInterview"
           value={candidate.videoInterview}
@@ -99,6 +104,7 @@ const EditCandidate = () => {
           placeholder="Video Interview"
           className="w-full p-2 mb-4 border rounded"
         />
+        <label className="text-gray-700">Coding Results</label>
         <input
           name="codingResults"
           value={candidate.codingResults}
